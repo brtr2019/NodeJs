@@ -61,22 +61,45 @@ app.post('/artists', function (req, res) {
     })
 })
 
+//----------Апдейт артиста по id--------------------------
 app.put('/artists/:id',function(req,res){
-	var artist = artists.find(function(artist){
+	/*var artist = artists.find(function(artist){
 		return artist.id === Number(req.params.id);
 	})
 	artist.name = req.body.name;
 	console.log(req.body.name);
 	//res.send(artist);
-	res.sendStatus(200);
+	res.sendStatus(200);*/
+  db.collection('artists').updateOne(
+    {_id:ObjectId(req.params.id)},{name:req.body.name},function(err,result){
+    if(err){
+      console.log(err);
+      return res.sendStatus(500);
+    }
+    res.sendStatus(200);
+  })
+})
+app.delete('/artists/:id', function (req, res) {
+  db.collection('artists').deleteOne(
+    { _id: ObjectID(req.params.id)},
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return res.sendStatus(500);
+      }
+    res.sendStatus(200);
+  })
 })
 
-app.delete('/artists/:id',function(req,res){
-	artists = artists.filter(function(artist){
-		return artist.id !== Number(req.params.id);
-	})
-	res.sendStatus(200);
-})
+/*app.delete('/artists/:id',function(req,res){
+  db.collections('artists').deleteOne({_id:ObjectId(req.params.id)},function(err,result){
+    if(err){
+      console.log(err);
+      return res.sendStatus(500);
+    }
+    res.sendStatus(200);
+  })
+})*/
 //-----------добавлено новое-------------------------
 MongoClient.connect('mongodb://localhost:27017/myapi', function (err, database) {
     if (err) {
@@ -87,6 +110,9 @@ MongoClient.connect('mongodb://localhost:27017/myapi', function (err, database) 
         console.log('API app started');
     })
 })
+
+
+
 
 
 
