@@ -1,12 +1,13 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectId;
 var app = express();
 var db;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 //----------Artists----------------------
-var artists = [
+/*var artists = [
   {
     id: 1,
     name: 'Metallica'
@@ -19,11 +20,12 @@ var artists = [
     id: 3,
     name: 'Deep Purple'
   }
-];
-//------------Routing-----------------
+];*/
+//------------Routing------------------------
 app.get('/', function(req, res) {
 	res.send('Hello world!!');
 });
+//----Получить всех артистов-------------------
 app.get('/artists', function (req, res) {
     db.collection('artists').find().toArray(function (err, docs) {
         if (err) {
@@ -33,14 +35,18 @@ app.get('/artists', function (req, res) {
         res.send(docs);
     })
 });
+//-------------Получить артиста по ID----------
 app.get('/artists/:id', function (req, res) {
-  var artist = artists.find(function (artist) {
-    return artist.id === Number(req.params.id);
+  db.collection('artists').findOne({_id:ObjectId(req.params.id)},function(err,doc){
+    if(err){
+      console.log(err);
+      return res.sendStatus(500);
+    }
+    res.send(doc);
   })
-  console.log(artist);
-  res.send(artist);
 });
 
+//-------добавить одного артиста по запросу------------
 app.post('/artists', function (req, res) {
     var artist = {
         name: req.body.name
@@ -71,12 +77,7 @@ app.delete('/artists/:id',function(req,res){
 	})
 	res.sendStatus(200);
 })
-
-//-----------Run server------------------
-/*app.listen(3012, function() {
-	console.log('Server started!!');
-});*/
-
+//-----------добавлено новое-------------------------
 MongoClient.connect('mongodb://localhost:27017/myapi', function (err, database) {
     if (err) {
         return console.log(err);
@@ -86,5 +87,8 @@ MongoClient.connect('mongodb://localhost:27017/myapi', function (err, database) 
         console.log('API app started');
     })
 })
+
+
+
 
 
